@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Camelsoft — Sites para quem pensa grande e caminha longe</title>
+<meta name="description" content="Camelsoft desenvolve sites de alta performance em HTML, CSS e JS puro — sem templates genéricos. SEO, integração com WhatsApp e suporte pós-entrega inclusos em todos os planos." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23D96B27'/%3E%3Cpath d='M8 40 L20 24 L30 34 L40 18 L56 40 Z' fill='%23FAF4EB'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  /* ============ DESIGN TOKENS ============ */
+  :root{
+    --bg-page:#FAF4EB;
+    --bg-alt:#F3EBDD;
+    --surface:#FFFFFF;
+    --border:#EAE3D9;
+    --text-primary:#1A1613;
+    --text-body:#2D2722;
+    --text-muted:#7A7268;
+    --accent:#D96B27;
+    --accent-dark:#B8541F;
+    --accent-tint:#F0A868;
+    --on-accent:#FAF4EB;
+    --font-display:'Bricolage Grotesque', sans-serif;
+    --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  html.dark{
+    --bg-page:#17130F;
+    --bg-alt:#1C1712;
+    --surface:#211B15;
+    --border:#362C22;
+    --text-primary:#F5EEE1;
+    --text-body:#E4D9C8;
+    --text-muted:#B5A996;
+    --accent:#E8813F;
+    --accent-dark:#F0A868;
+    --accent-tint:#B8541F;
+  }
+
+  /* ============ RESET / BASE ============ */
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; font-family:var(--font-body); background:var(--bg-page); color:var(--text-body);
+    transition:background-color .3s ease, color .3s ease; -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  img,svg{ display:block; max-width:100%; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font:inherit; cursor:pointer; background:none; border:none; color:inherit; }
+  ul{ list-style:none; margin:0; padding:0; }
+  input,textarea,select{ font:inherit; color:inherit; }
+  h1,h2,h3,p{ margin:0; }
+  .hidden{ display:none !important; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
+
+  input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible{
+    outline:2px solid var(--accent); outline-offset:3px;
+  }
+
+  /* ============ LAYOUT HELPERS ============ */
+  .container{ max-width:1152px; margin-inline:auto; padding-inline:20px; }
+  @media (min-width:640px){ .container{ padding-inline:32px; } }
+
+  .section{ padding-block:80px; }
+  @media (min-width:768px){ .section{ padding-block:112px; } }
+  .section--alt{ background:var(--bg-alt); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+
+  .eyebrow{ font-family:var(--font-mono); font-size:.75rem; text-transform:uppercase; letter-spacing:.2em; color:var(--accent); margin-bottom:1rem; }
+  .heading{ font-family:var(--font-display); font-weight:600; color:var(--text-primary); letter-spacing:-0.01em; }
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.5rem; border-radius:999px;
+    font-family:var(--font-mono); font-size:.8125rem; text-transform:uppercase; letter-spacing:.05em;
+    padding:.95rem 2rem; transition:background-color .2s ease, color .2s ease, border-color .2s ease; cursor:pointer;
+  }
+  .btn-primary{ background:var(--accent); color:var(--on-accent); }
+  .btn-primary:hover{ background:var(--accent-dark); }
+  .btn-outline{ border:1px solid var(--text-primary); color:var(--text-primary); background:transparent; }
+  .btn-outline:hover{ border-color:var(--accent); color:var(--accent); }
+  .btn-outline-accent{ border:1px solid var(--accent); color:var(--accent-dark); background:transparent; }
+  html.dark .btn-outline-accent{ color:var(--accent-tint); }
+  .btn-outline-accent:hover{ background:var(--accent); color:var(--on-accent); }
+  .btn-block{ width:100%; }
+  @media (min-width:640px){ .btn-auto{ width:auto; } }
+
+  /* ============ HEADER ============ */
+  .header{ position:fixed; inset:0 0 auto 0; z-index:50; border-bottom:1px solid transparent; transition:background-color .3s ease, box-shadow .3s ease, border-color .3s ease; }
+  .header.is-scrolled{ background:rgba(250,244,235,.92); backdrop-filter:blur(10px); border-color:var(--border); box-shadow:0 1px 0 rgba(0,0,0,.03); }
+  html.dark .header.is-scrolled{ background:rgba(23,19,15,.92); }
+  .header-inner{ display:flex; align-items:center; justify-content:space-between; height:64px; }
+  @media (min-width:768px){ .header-inner{ height:80px; } }
+  .logo{ font-family:var(--font-display); font-weight:600; font-size:1.25rem; color:var(--text-primary); }
+  @media (min-width:768px){ .logo{ font-size:1.5rem; } }
+  .logo .dot{ color:var(--accent); }
+
+  .nav-desktop{ display:none; align-items:center; gap:2.25rem; font-family:var(--font-mono); font-size:.8125rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-body); }
+  @media (min-width:768px){ .nav-desktop{ display:flex; } }
+  .nav-desktop a:hover{ color:var(--accent); }
+
+  .header-actions{ display:none; align-items:center; gap:.75rem; }
+  @media (min-width:768px){ .header-actions{ display:flex; } }
+  .icon-btn{ width:40px; height:40px; display:grid; place-items:center; border-radius:999px; border:1px solid var(--border); color:var(--text-primary); transition:border-color .2s ease; }
+  .icon-btn:hover{ border-color:var(--accent); }
+  .icon-btn svg{ width:18px; height:18px; }
+
+  .menu-btn{ display:grid; place-items:center; width:40px; height:40px; color:var(--text-primary); }
+  @media (min-width:768px){ .menu-btn{ display:none; } }
+  .menu-btn svg{ width:24px; height:24px; }
+
+  .mobile-menu{ display:none; border-top:1px solid var(--border); background:var(--bg-page); }
+  .mobile-menu.is-open{ display:block; }
+  @media (min-width:768px){ .mobile-menu{ display:none !important; } }
+  .mobile-nav{ display:flex; flex-direction:column; padding:1.25rem 20px 1.5rem; gap:1rem; font-family:var(--font-mono); font-size:.875rem; text-transform:uppercase; letter-spacing:.03em; }
+  .mobile-menu-footer{ display:flex; align-items:center; justify-content:space-between; padding-top:.9rem; margin-top:.4rem; border-top:1px solid var(--border); }
+
+  /* ============ HERO ============ */
+  .hero{ position:relative; padding-top:128px; padding-bottom:56px; overflow:hidden; }
+  @media (min-width:768px){ .hero{ padding-top:176px; padding-bottom:80px; } }
+  .hero-inner{ max-width:56rem; margin-inline:auto; text-align:center; }
+  .hero h1{ font-size:2.35rem; line-height:1.1; }
+  @media (min-width:640px){ .hero h1{ font-size:3rem; } }
+  @media (min-width:768px){ .hero h1{ font-size:3.75rem; } }
+  @media (min-width:1024px){ .hero h1{ font-size:4.2rem; } }
+  .hero h1 em{ font-style:italic; color:var(--accent); }
+  .hero .lead{ margin-top:1.75rem; font-size:1rem; color:var(--text-body); max-width:42rem; margin-inline:auto; line-height:1.7; }
+  @media (min-width:768px){ .hero .lead{ font-size:1.125rem; } }
+  .hero-ctas{ margin-top:2.5rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; }
+  @media (min-width:640px){ .hero-ctas{ flex-direction:row; } }
+  .hero-ctas .btn{ width:100%; }
+  @media (min-width:640px){ .hero-ctas .btn{ width:auto; } }
+
+  .route-divider{ margin-top:4.5rem; max-width:64rem; margin-inline:auto; }
+  @media (min-width:768px){ .route-divider{ margin-top:6.5rem; } }
+  .route-line{ stroke-dasharray:7 9; animation:dash 40s linear infinite; }
+  @keyframes dash{ to{ stroke-dashoffset:-400; } }
+
+  /* ============ SCROLL REVEAL ============ */
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+  /* ============ DIFERENCIAIS ============ */
+  .diff-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media (min-width:768px){ .diff-grid{ grid-template-columns:repeat(4,1fr); gap:1.5rem; } }
+  .diff-card{ background:var(--surface); border:1px solid var(--border); border-radius:1rem; padding:1.25rem; }
+  @media (min-width:768px){ .diff-card{ padding:1.5rem; } }
+  .diff-card svg{ width:24px; height:24px; color:var(--accent); margin-bottom:1rem; }
+  .diff-card h3{ font-family:var(--font-display); font-weight:600; color:var(--text-primary); font-size:.9375rem; }
+  @media (min-width:768px){ .diff-card h3{ font-size:1rem; } }
+  .diff-card p{ margin-top:.5rem; font-size:.875rem; color:var(--text-muted); line-height:1.6; }
+
+  /* ============ PROCESSO ============ */
+  .process-heading{ max-width:32rem; }
+  .process-grid{ margin-top:3.5rem; display:grid; grid-template-columns:1fr; gap:2.25rem; }
+  @media (min-width:768px){ .process-grid{ grid-template-columns:repeat(4,1fr); gap:1.5rem; } }
+  .process-step .num{ font-family:var(--font-display); font-size:2.25rem; color:var(--accent); opacity:.4; }
+  .process-step h3{ font-family:var(--font-display); font-weight:600; color:var(--text-primary); margin-top:.75rem; }
+  .process-step p{ margin-top:.5rem; font-size:.875rem; color:var(--text-muted); line-height:1.6; }
+
+  /* ============ PLANOS ============ */
+  .plans-intro{ max-width:36rem; }
+  .plans-intro p{ margin-top:1rem; color:var(--text-muted); line-height:1.7; }
+  .plans-grid{ margin-top:3.5rem; display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:start; }
+  @media (min-width:768px){ .plans-grid{ grid-template-columns:repeat(3,1fr); } }
+
+  .plan-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:1rem; padding:1.75rem;
+    display:flex; flex-direction:column; height:100%; transition:transform .35s ease, box-shadow .35s ease;
+  }
+  @media (min-width:768px){ .plan-card{ padding:2rem; } }
+  .plan-card:hover{ transform:translateY(-6px); }
+  .plan-card--featured{ position:relative; border:2px solid var(--accent); box-shadow:0 20px 45px -15px rgba(217,107,39,.35); }
+  @media (min-width:768px){ .plan-card--featured{ transform:translateY(-10px); } }
+  .plan-card--featured:hover{ transform:translateY(-16px); }
+
+  .plan-badge{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-family:var(--font-mono); font-size:.6875rem;
+    text-transform:uppercase; letter-spacing:.03em; background:var(--accent); color:var(--on-accent);
+    padding:.35rem 1rem; border-radius:999px; white-space:nowrap;
+  }
+  .plan-name{ font-family:var(--font-display); font-weight:600; font-size:1.25rem; color:var(--text-primary); }
+  .plan-sub{ font-size:.875rem; color:var(--text-muted); margin-top:.25rem; }
+  .plan-price{ font-family:var(--font-mono); font-weight:600; font-size:1.875rem; color:var(--text-primary); margin-top:1.5rem; }
+  .plan-price .unit{ font-size:1rem; font-weight:400; color:var(--text-muted); }
+  .plan-features{ margin-top:1.5rem; flex:1; display:flex; flex-direction:column; gap:.75rem; font-size:.875rem; }
+  .plan-features li{ display:flex; gap:.625rem; align-items:flex-start; }
+  .plan-features svg{ width:16px; height:16px; margin-top:2px; flex-shrink:0; color:var(--accent); }
+  .plan-note{ font-family:var(--font-mono); font-size:.75rem; color:var(--text-muted); margin-top:1.5rem; }
+
+  /* ============ MANUTENÇÃO (recorrente) ============ */
+  .maintenance{
+    margin-top:2rem; border:1px dashed rgba(217,107,39,.5); border-radius:1rem; padding:1.75rem;
+    background:rgba(240,168,104,.12); display:flex; flex-direction:column; gap:1.5rem;
+  }
+  html.dark .maintenance{ background:rgba(232,129,63,.07); }
+  @media (min-width:768px){ .maintenance{ flex-direction:row; align-items:center; padding:2.25rem; gap:2.5rem; } }
+  .maintenance-body{ flex:1; }
+  .maintenance-tag{
+    display:inline-block; font-family:var(--font-mono); font-size:.6875rem; text-transform:uppercase; letter-spacing:.03em;
+    background:rgba(217,107,39,.16); color:var(--accent-dark); padding:.3rem .8rem; border-radius:999px;
+  }
+  html.dark .maintenance-tag{ color:var(--accent-tint); }
+  .maintenance-body h3{ font-family:var(--font-display); font-weight:600; font-size:1.25rem; color:var(--text-primary); margin-top:1rem; }
+  .maintenance-body p{ margin-top:.5rem; font-size:.875rem; color:var(--text-muted); line-height:1.65; max-width:36rem; }
+  .maintenance-cta{ display:flex; flex-direction:column; align-items:flex-start; gap:1rem; flex-shrink:0; }
+  @media (min-width:768px){ .maintenance-cta{ align-items:flex-end; } }
+  .maintenance-price{ font-family:var(--font-mono); font-size:1.5rem; color:var(--text-primary); }
+  .maintenance-price strong{ font-weight:600; }
+  .maintenance-price span{ font-size:.875rem; color:var(--text-muted); }
+
+  /* ============ ORÇAMENTO ============ */
+  .orcamento-grid{ display:grid; grid-template-columns:1fr; gap:3rem; }
+  @media (min-width:768px){ .orcamento-grid{ grid-template-columns:2fr 3fr; gap:4rem; } }
+  .orcamento-intro p{ margin-top:1rem; color:var(--text-muted); line-height:1.7; }
+  .contact-list{ margin-top:2rem; display:flex; flex-direction:column; gap:.75rem; font-family:var(--font-mono); font-size:.875rem; }
+  .contact-list a{ display:flex; align-items:center; gap:.75rem; color:var(--text-primary); transition:color .2s ease; }
+  .contact-list a:hover{ color:var(--accent); }
+  .contact-list svg{ width:16px; height:16px; flex-shrink:0; }
+
+  .form-card{ background:var(--surface); border:1px solid var(--border); border-radius:1rem; padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem; }
+  @media (min-width:768px){ .form-card{ padding:2rem; } }
+  .field label{ display:block; font-family:var(--font-mono); font-size:.75rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-muted); margin-bottom:.5rem; }
+  .field input, .field select, .field textarea{
+    width:100%; border-radius:.5rem; border:1px solid var(--border); background:var(--bg-page); color:var(--text-primary);
+    padding:.8rem 1rem; font-size:.875rem;
+  }
+  .field textarea{ resize:vertical; min-height:5rem; }
+  .field-error{ font-size:.75rem; color:var(--accent-dark); margin-top:.4rem; }
+  html.dark .field-error{ color:var(--accent-tint); }
+  .field input.has-error, .field textarea.has-error{ border-color:var(--accent-dark); }
+  .form-success{ font-family:var(--font-mono); font-size:.875rem; color:var(--accent-dark); }
+  html.dark .form-success{ color:var(--accent-tint); }
+
+  /* ============ FOOTER ============ */
+  .footer{ padding-top:80px; padding-bottom:40px; }
+  .footer-cta{ max-width:36rem; margin-inline:auto; text-align:center; }
+  .footer-cta h2{ font-size:1.875rem; }
+  @media (min-width:768px){ .footer-cta h2{ font-size:2.25rem; } }
+  .footer-cta-buttons{ margin-top:2rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; }
+  @media (min-width:640px){ .footer-cta-buttons{ flex-direction:row; } }
+
+  .footer-bottom{ max-width:1152px; margin:4rem auto 0; padding-top:2rem; border-top:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:1rem; text-align:center; }
+  @media (min-width:640px){ .footer-bottom{ flex-direction:row; text-align:left; } }
+  .footer-mark{ font-family:var(--font-display); font-weight:600; color:var(--text-primary); }
+  .footer-nav{ display:flex; align-items:center; gap:1.5rem; font-family:var(--font-mono); font-size:.75rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-muted); }
+  .footer-nav a:hover{ color:var(--accent); }
+  .footer-meta{ font-family:var(--font-mono); font-size:.75rem; color:var(--text-muted); text-align:center; }
+  @media (min-width:640px){ .footer-meta{ text-align:right; } }
+</style>
+</head>
+
+<body>
+
+<!-- ======================= HEADER ======================= -->
+<header id="site-header" class="header">
+  <div class="container">
+    <div class="header-inner">
+      <a href="#topo" class="logo">camelsoft<span class="dot">.</span></a>
+
+      <nav class="nav-desktop">
+        <a href="#diferenciais">Diferenciais</a>
+        <a href="#processo">Processo</a>
+        <a href="#planos">Planos</a>
+        <a href="#orcamento">Contacto</a>
+      </nav>
+
+      <div class="header-actions">
+        <button id="theme-toggle" type="button" aria-label="Alternar modo escuro" class="icon-btn">
+          <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg id="icon-moon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <a href="#" class="js-whatsapp-link btn btn-primary">Falar no WhatsApp</a>
+      </div>
+
+      <button id="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" class="menu-btn">
+        <svg id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg id="icon-close" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="mobile-menu">
+    <nav class="mobile-nav">
+      <a href="#diferenciais" class="mobile-nav-link">Diferenciais</a>
+      <a href="#processo" class="mobile-nav-link">Processo</a>
+      <a href="#planos" class="mobile-nav-link">Planos</a>
+      <a href="#orcamento" class="mobile-nav-link">Contacto</a>
+      <div class="mobile-menu-footer">
+        <button id="theme-toggle-mobile" type="button">Modo escuro</button>
+        <a href="#" class="js-whatsapp-link btn btn-primary" style="padding:.6rem 1.25rem;font-size:.75rem;">WhatsApp</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="topo">
+
+<!-- ======================= HERO ======================= -->
+<section class="hero container">
+  <div class="hero-inner">
+    <p class="eyebrow">Camelsoft — Sites</p>
+    <h1 class="heading">Sites para quem <em>pensa grande</em> e caminha longe.</h1>
+    <p class="lead">HTML, CSS e JS puro — sem templates genéricos. Cada plano inclui SEO, integração com WhatsApp e suporte pós-entrega.</p>
+    <div class="hero-ctas">
+      <a href="#planos" class="btn btn-primary btn-auto">Ver planos &amp; preços</a>
+      <a href="#" class="js-whatsapp-link btn btn-outline btn-auto">Falar no WhatsApp</a>
+    </div>
+  </div>
+
+  <!-- Signature: route/dune divider tying "caminha longe" to the real build steps -->
+  <div class="route-divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 160" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,120 C150,80 280,150 420,110 C560,70 620,130 760,95 C900,60 980,120 1200,85 L1200,160 L0,160 Z" fill="var(--accent)" style="opacity:.1" />
+      <path d="M20,95 C170,60 300,125 440,90 C580,55 640,115 780,80 C920,45 1000,100 1180,68" fill="none" stroke="var(--accent)" stroke-width="1.5" class="route-line" style="opacity:.6" />
+      <g fill="var(--accent)">
+        <circle cx="40" cy="93" r="4.5"/>
+        <circle cx="440" cy="90" r="4.5"/>
+        <circle cx="780" cy="80" r="4.5"/>
+        <circle cx="1160" cy="70" r="4.5"/>
+      </g>
+      <g fill="var(--text-muted)" style="font-family:'IBM Plex Mono',monospace; font-size:11px;">
+        <text x="40" y="118" text-anchor="middle">HTML</text>
+        <text x="440" y="115" text-anchor="middle">CSS</text>
+        <text x="780" y="105" text-anchor="middle">JS</text>
+        <text x="1160" y="95" text-anchor="middle">SEO</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ======================= DIFERENCIAIS ======================= -->
+<section id="diferenciais" class="container" style="padding-bottom:80px;">
+  <div class="diff-grid">
+
+    <div class="reveal diff-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4L2 12l6 8M16 4l6 8-6 8M14 3l-4 18"/></svg>
+      <h3>Código 100% próprio</h3>
+      <p>Sem construtores nem templates genéricos: cada linha é escrita à mão para o seu projecto.</p>
+    </div>
+
+    <div class="reveal diff-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <h3>SEO em todos os planos</h3>
+      <p>Estrutura optimizada para motores de busca desde o primeiro dia, sem custo extra.</p>
+    </div>
+
+    <div class="reveal diff-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.5 8.5 0 0 1-4-1L3 20l1.2-5a8.4 8.4 0 1 1 16.8-3.5z"/></svg>
+      <h3>WhatsApp integrado</h3>
+      <p>Contacto directo com os seus clientes, sem formulários que se perdem no email.</p>
+    </div>
+
+    <div class="reveal diff-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6 6 1-4.5 4.3L17.5 20 12 17l-5.5 3 1-6.7L3 9l6-1z"/></svg>
+      <h3>Suporte pós-entrega</h3>
+      <p>Acompanhamos o lançamento e resolvemos o que aparecer, prazo incluído no plano.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================= PROCESSO ======================= -->
+<section id="processo" class="section section--alt">
+  <div class="container">
+    <p class="eyebrow">Como trabalhamos</p>
+    <h2 class="heading process-heading" style="font-size:2rem;">A jornada do seu site, do briefing à entrega.</h2>
+
+    <div class="process-grid">
+      <div class="reveal process-step">
+        <span class="num">01</span>
+        <h3>Briefing</h3>
+        <p>Entendemos o seu negócio, público e objectivos antes de desenhar seja o que for.</p>
+      </div>
+      <div class="reveal process-step">
+        <span class="num">02</span>
+        <h3>Design</h3>
+        <p>Criamos um layout próprio para a sua marca — nunca reciclado de outro cliente.</p>
+      </div>
+      <div class="reveal process-step">
+        <span class="num">03</span>
+        <h3>Desenvolvimento</h3>
+        <p>Escrevemos HTML, CSS e JS à mão, optimizado para velocidade, SEO e mobile.</p>
+      </div>
+      <div class="reveal process-step">
+        <span class="num">04</span>
+        <h3>Entrega &amp; suporte</h3>
+        <p>O site vai ao ar com domínio e alojamento prontos, mais o suporte do seu plano.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PLANOS ======================= -->
+<section id="planos" class="section">
+  <div class="container">
+    <div class="plans-intro">
+      <p class="eyebrow">Planos &amp; preços</p>
+      <h2 class="heading" style="font-size:2rem;">Escolha a jornada certa para o seu negócio.</h2>
+      <p>Domínio .AO e alojamento incluídos no primeiro ano em todos os planos. Sem letras pequenas.</p>
+    </div>
+
+    <div class="plans-grid">
+
+      <!-- ESSENCIAL -->
+      <div class="reveal plan-card">
+        <h3 class="plan-name">Essencial</h3>
+        <p class="plan-sub">Landing page de 1 página</p>
+        <p class="plan-price">280.000 <span class="unit">Kz</span></p>
+
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>1 página, estrutura de conversão</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Design responsivo</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Widget WhatsApp</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Domínio .AO incluído (1 ano)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Alojamento web (1 ano)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>SEO básico (meta tags)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Formulário de contacto</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Animações básicas</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>1 revisão incluída</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>7 dias de suporte pós-entrega</span></li>
+        </ul>
+
+        <p class="plan-note">Renovação anual (domínio + alojamento): 45.000 Kz</p>
+        <button type="button" data-plan="Essencial" class="plan-cta btn btn-outline btn-block" style="margin-top:1.5rem;">Solicitar orçamento</button>
+      </div>
+
+      <!-- PROFISSIONAL — destaque -->
+      <div class="reveal plan-card plan-card--featured">
+        <span class="plan-badge">Mais escolhido</span>
+        <h3 class="plan-name" style="margin-top:.5rem;">Profissional</h3>
+        <p class="plan-sub">Site até 5 páginas</p>
+        <p class="plan-price">450.000 <span class="unit">Kz</span></p>
+
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Até 5 páginas básicas</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Design responsivo</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Widget WhatsApp</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Domínio .AO incluído (1 ano)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Alojamento web (1 ano)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>SEO completo (Schema, Open Graph)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Animações básicas</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Formulário com validação</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Integração com Google Maps</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Integração com Google Analytics</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Email profissional (opcional)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>2 revisões incluídas</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>14 dias de suporte pós-entrega</span></li>
+        </ul>
+
+        <p class="plan-note">Renovação anual (domínio + alojamento): 45.000 Kz</p>
+        <button type="button" data-plan="Profissional" class="plan-cta btn btn-primary btn-block" style="margin-top:1.5rem;">Solicitar orçamento</button>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="reveal plan-card">
+        <h3 class="plan-name">Premium</h3>
+        <p class="plan-sub">Site com animações avançadas</p>
+        <p class="plan-price">780.000 <span class="unit">Kz</span></p>
+
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Até 6 páginas personalizadas + página adicional (5.000 Kz cada)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Design premium</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Domínio .AO incluído (1 ano)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Alojamento web (1 ano)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Modo escuro/claro</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Widget WhatsApp personalizado e dinâmico</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Página de formulário de orçamento</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Animações e interações avançadas</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>SEO avançado + Google Analytics</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Formulário com validação</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Integração com Google Maps</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Galeria de imagens</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Slides de projecto (opcional)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Email profissional (opcional)</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>3 revisões incluídas</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>30 dias de suporte pós-entrega</span></li>
+        </ul>
+
+        <p class="plan-note">Renovação anual (domínio + alojamento): 45.000 Kz</p>
+        <button type="button" data-plan="Premium" class="plan-cta btn btn-outline btn-block" style="margin-top:1.5rem;">Solicitar orçamento</button>
+      </div>
+    </div>
+
+    <!-- RECORRENTE: Manutenção -->
+    <div class="reveal maintenance">
+      <div class="maintenance-body">
+        <span class="maintenance-tag">Recorrente</span>
+        <h3>Manutenção mensal</h3>
+        <p>Pequenas alterações de texto e imagens, backups regulares, monitorização de segurança e suporte contínuo por WhatsApp — para quem quer o site sempre actualizado sem se preocupar.</p>
+      </div>
+      <div class="maintenance-cta">
+        <p class="maintenance-price">a partir de <strong>15.000 Kz</strong><span> / mês</span></p>
+        <button type="button" data-plan="Manutenção mensal" class="plan-cta btn btn-outline-accent btn-block btn-auto">Falar sobre manutenção</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================= ORÇAMENTO ======================= -->
+<section id="orcamento" class="section section--alt">
+  <div class="container orcamento-grid">
+
+    <div class="orcamento-intro">
+      <p class="eyebrow">Orçamento</p>
+      <h2 class="heading" style="font-size:1.875rem;">Vamos falar sobre o seu site.</h2>
+      <p>Preencha os dados ao lado e enviamos a sua mensagem directamente para o nosso WhatsApp — sem espera por email.</p>
+
+      <div class="contact-list">
+        <a href="#" class="js-whatsapp-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.5 8.5 0 0 1-4-1L3 20l1.2-5a8.4 8.4 0 1 1 16.8-3.5z"/></svg>
+          WhatsApp
+        </a>
+        <a href="mailto:contacto@camelsoft.ao">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
+          contacto@camelsoft.ao
+        </a>
+      </div>
+    </div>
+
+    <form id="orcamento-form" class="form-card" novalidate>
+      <div class="field">
+        <label for="nome">Nome *</label>
+        <input id="nome" name="nome" type="text" required />
+        <p class="field-error hidden">Indique o seu nome.</p>
+      </div>
+
+      <div class="field">
+        <label for="contacto">Telefone ou email *</label>
+        <input id="contacto" name="contacto" type="text" required />
+        <p class="field-error hidden">Indique um contacto válido.</p>
+      </div>
+
+      <div class="field">
+        <label for="plano">Plano de interesse</label>
+        <select id="plano" name="plano">
+          <option value="Não especificado">Ainda não sei</option>
+          <option value="Essencial">Essencial — 280.000 Kz</option>
+          <option value="Profissional">Profissional — 450.000 Kz</option>
+          <option value="Premium">Premium — 780.000 Kz</option>
+          <option value="Manutenção mensal">Manutenção mensal</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="mensagem">Mensagem</label>
+        <textarea id="mensagem" name="mensagem" rows="3" placeholder="Conte-nos um pouco sobre o seu negócio..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Enviar via WhatsApp</button>
+      <p id="form-success" class="form-success hidden">A abrir o WhatsApp com a sua mensagem...</p>
+    </form>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ======================= FOOTER ======================= -->
+<footer class="footer container">
+  <div class="footer-cta">
+    <h2 class="heading">Fale connosco para um orçamento personalizado.</h2>
+    <div class="footer-cta-buttons">
+      <a href="#" class="js-whatsapp-link btn btn-primary btn-auto">WhatsApp</a>
+      <a href="mailto:contacto@camelsoft.ao" class="btn btn-outline btn-auto">contacto@camelsoft.ao</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-mark">camelsoft<span style="color:var(--accent);">.</span></p>
+    <nav class="footer-nav">
+      <a href="#planos">Planos</a>
+      <a href="#processo">Processo</a>
+      <a href="#orcamento">Contacto</a>
+    </nav>
+    <p class="footer-meta">Feito à mão, sem templates.<br>© <span id="year"></span> Camelsoft.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // ---- CONFIG: substitua pelo número real de WhatsApp da Camelsoft (formato internacional, só dígitos) ----
+  var WHATSAPP_NUMBER = "244923000000";
+
+  function whatsappLink(text) {
+    return "https://wa.me/" + WHATSAPP_NUMBER + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+
+  document.querySelectorAll(".js-whatsapp-link").forEach(function (el) {
+    el.setAttribute("href", whatsappLink("Olá Camelsoft! Gostaria de saber mais sobre os vossos sites."));
+    el.setAttribute("target", "_blank");
+    el.setAttribute("rel", "noopener noreferrer");
+  });
+
+  // ---- Header shadow on scroll ----
+  var header = document.getElementById("site-header");
+  function onScroll() {
+    header.classList.toggle("is-scrolled", window.scrollY > 12);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // ---- Mobile menu ----
+  var menuToggle = document.getElementById("menu-toggle");
+  var mobileMenu = document.getElementById("mobile-menu");
+  var iconMenu = document.getElementById("icon-menu");
+  var iconClose = document.getElementById("icon-close");
+
+  menuToggle.addEventListener("click", function () {
+    var isOpen = mobileMenu.classList.toggle("is-open");
+    iconMenu.classList.toggle("hidden", isOpen);
+    iconClose.classList.toggle("hidden", !isOpen);
+    menuToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  document.querySelectorAll(".mobile-nav-link").forEach(function (link) {
+    link.addEventListener("click", function () {
+      mobileMenu.classList.remove("is-open");
+      iconMenu.classList.remove("hidden");
+      iconClose.classList.add("hidden");
+    });
+  });
+
+  // ---- Theme toggle (light/dark) ----
+  var root = document.documentElement;
+  var iconSun = document.getElementById("icon-sun");
+  var iconMoon = document.getElementById("icon-moon");
+
+  function setTheme(isDark) {
+    root.classList.toggle("dark", isDark);
+    iconSun.classList.toggle("hidden", isDark);
+    iconMoon.classList.toggle("hidden", !isDark);
+  }
+  function toggleTheme() {
+    setTheme(!root.classList.contains("dark"));
+  }
+  document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+  document.getElementById("theme-toggle-mobile").addEventListener("click", toggleTheme);
+
+  var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(prefersDark);
+
+  // ---- Scroll reveal ----
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var revealEls = document.querySelectorAll(".reveal");
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  }
+
+  // ---- Pricing CTAs -> scroll to form + preselect plan ----
+  var planoSelect = document.getElementById("plano");
+  document.querySelectorAll(".plan-cta").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var plan = btn.getAttribute("data-plan");
+      if (plan && planoSelect) planoSelect.value = plan;
+      var target = document.getElementById("orcamento");
+      if (target) target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      var nomeInput = document.getElementById("nome");
+      if (nomeInput) setTimeout(function () { nomeInput.focus(); }, 500);
+    });
+  });
+
+  // ---- Form validation + WhatsApp submit ----
+  var form = document.getElementById("orcamento-form");
+  var successMsg = document.getElementById("form-success");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nome = document.getElementById("nome");
+    var contacto = document.getElementById("contacto");
+    var plano = document.getElementById("plano").value;
+    var mensagem = document.getElementById("mensagem").value.trim();
+    var valid = true;
+
+    [nome, contacto].forEach(function (input) {
+      var errorEl = input.parentElement.querySelector(".field-error");
+      var filled = input.value.trim().length > 1;
+      input.classList.toggle("has-error", !filled);
+      if (errorEl) errorEl.classList.toggle("hidden", filled);
+      if (!filled) valid = false;
+    });
+
+    if (!valid) return;
+
+    var texto = "Olá Camelsoft! Meu nome é " + nome.value.trim() +
+      ". Tenho interesse no plano: " + plano +
+      ". Contacto: " + contacto.value.trim() +
+      (mensagem ? ". Mensagem: " + mensagem : "");
+
+    successMsg.classList.remove("hidden");
+    window.open(whatsappLink(texto), "_blank", "noopener,noreferrer");
+    form.reset();
+    setTimeout(function () { successMsg.classList.add("hidden"); }, 6000);
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+})();
+</script>
+
+</body>
+</html>
